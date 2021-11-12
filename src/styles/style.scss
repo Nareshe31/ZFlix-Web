@@ -1,0 +1,89 @@
+
+.search-container{
+    .search-input-container{
+        padding: 10px 30px;
+        .search-input{
+            border: none;
+            color: black;
+            outline: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            width: 100%;
+        }
+
+    }
+    .search-results{
+        .results-container{
+            display: flex;
+            flex-wrap: wrap;
+            .result-box{
+                display: flex;
+                border-radius: 10px;
+                margin: 20px 10px;
+                background-color: #888;
+                width: 130px;
+                position: relative;
+                cursor: pointer;
+                .result-image{
+                    width: 100%;
+                    height: 160px;
+                    position: relative;
+                    // border-top-left-radius: 10px;
+                    // border-bottom-left-radius: 10px;
+
+                    img{
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 10px;
+                        object-fit: cover;
+                        // border-top-left-radius: 10px;
+                        // border-bottom-left-radius: 10px;
+                    }
+                }
+                .result-detail{
+                    width: max-content;
+                    padding: 10px;
+                }
+            }
+        }
+    }
+    .load-more{
+        button{
+            background: #444;
+            padding: 5px 10px;
+            border-radius: 5px;
+            outline: none;
+            border: none;
+            cursor: pointer;
+        }
+    }
+}
+
+.navbar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 35px 15px 20px;
+    .nav-header{
+        img{
+            width: 60px;
+            height: 60px;
+        }
+    }
+    .nav-list{
+        list-style: none;
+        display: flex;
+        align-items: center;
+        a{
+            margin-left: 40px;
+        }
+        .nav-item{
+            font-size: 16px;
+            font-weight: 500;
+            padding: 5px;
+            i{
+                font-size: 20px;
+            }
+        }
+    }
+}
