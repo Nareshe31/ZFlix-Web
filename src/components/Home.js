@@ -5,9 +5,11 @@ import Poster from './molecules/Poster';
 
 function Home() {
   const [movieData, setmovieData] = useState([])
+  const [tvData, settvData] = useState([])
   useEffect(() => {
     async function getAllResults() {
       await getMovieData();
+      await getTvData()
     }
     getAllResults()
     return () => {
@@ -28,13 +30,32 @@ function Home() {
     }
   };
 
+  const getTvData = async () => {
+    try {
+      var response = await axios.get(
+        `https://api.themoviedb.org/3/trending/tv/day?api_key=dfc43a605d906f9da6982495ad7bb34e`
+      );
+      settvData(response.data.results);
+    } catch (error) {
+      console.log("error");
+    }
+  };
+
   return (
-    <div className="main">
+    <div className="main" style={{paddingTop:"50px"}}>
       <div className="whole-poster">
         <div className="poster-header">Trending Movies</div>
         <div className="poster-container">
           {movieData.map((item) => (
             <Poster type="movie" key={item.id} item={item} />
+          ))}
+        </div>
+      </div>
+      <div className="whole-poster">
+        <div className="poster-header">Trending TV Shows</div>
+        <div className="poster-container">
+          {tvData.map((item) => (
+            <Poster type="tv" key={item.id} item={item} />
           ))}
         </div>
       </div>

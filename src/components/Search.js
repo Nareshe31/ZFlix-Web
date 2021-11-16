@@ -1,51 +1,100 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, Link } from "react-router-dom";
 import axios from "axios";
+import Header from "./Header";
 
+const months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]
+
+const getDate = (date) => {
+    return months[date?.split("-")[1]-1]+" "+date?.split("-")[2]+", "+date?.split("-")[0];
+  };
+
+  const getYear = (date) => {
+    return date?.slice(0, 4);
+  };
 function Movie({ item }) {
     return (
-        <Link to={"/watch/movie/" + item.id + "/" + item.title}>
+        <Link to={"/en/watch/movie/" + item.id + "/" + item.title}>
             <div className="result-box" key={item.id}>
                 <div className="result-image">
                     <img
-                        src={"https://image.tmdb.org/t/p/original" + item.poster_path}
+                        src={item.poster_path?("https://image.tmdb.org/t/p/original" + item.poster_path):"https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg"}
                         alt=""
                         srcset=""
+                        className={item.poster_path?"":"no-image"}
                     />
                 </div>
-                {/* <div className="result-detail">
-                <p className="result-title">{item.title}</p>
-            </div> */}
+                <div className="result-detail">
+                    <p className="result-title">{item.title}</p>
+                    <p className="result-tagline">{item.tagline}</p>
+                    <p className="result-date">
+                        <span><i class="far fa-calendar"></i></span>
+                        {getDate(item.release_date)}
+                    </p>
+                    <p className="result-overview">{item.overview}</p> 
+                    <div className="watch-now">
+                            <span><i class="fas fa-play"></i></span>
+                            Watch Now
+                        </div>                   
+                    <p className="result-type">Movie</p>
+
+                </div>
+            </div>
+        </Link>
+    );
+}
+function TvShow({ item }) {
+    return (
+        <Link to={"/en/watch/tv/" + item.id + "/" + item.name}>
+            <div className="result-box" key={item.id}>
+                <div className="result-image">
+                    <img
+                        src={item.poster_path?("https://image.tmdb.org/t/p/original" + item.poster_path):"https://www.themoviedb.org/assets/2/v4/glyphicons/basic/glyphicons-basic-38-picture-grey-c2ebdbb057f2a7614185931650f8cee23fa137b93812ccb132b9df511df1cfac.svg"}
+                        alt=""
+                        srcset=""
+                        className={item.poster_path?"":"no-image"}
+                    />
+                </div>
+                <div className="result-detail">
+                    <p className="result-title">{item.name}</p>
+                    <p className="result-date">
+                        <span><i class="far fa-calendar"></i></span>
+                        {getDate(item.first_air_date)}
+                    </p>
+                    <p className="result-tagline">{item.tagline}</p>
+                    <p className="result-overview">{item.overview}</p>
+                    <p className="result-type">TV Show</p>
+                </div>
             </div>
         </Link>
     );
 }
 
 function Search(props) {
+    const {search}=useLocation()
     let queryParams = new URLSearchParams(useLocation().search);
     const [results, setresults] = useState([]);
-    const [query, setquery] = useState(queryParams.get("query"));
-    const [currentPage, setcurrentPage] = useState(1)
+    const [query, setquery] = useState(queryParams.get("q"));
     const [totalPages, settotalPages] = useState()
-
+    let pageNumber=queryParams.get("page")?queryParams.get("page"):1
     useEffect(() => {
         async function getAllResults() {
-            await getResults();
+            setresults([])
+            await getResults(queryParams.get("q"));
         }
         getAllResults();
         return () => { };
-    }, [currentPage]);
+    },[search]);
 
-    const getResults = async () => {
+    const getResults = async (query) => {
         try {
             if (query) {
                 var response = await axios.get(
                     `
-            https://api.themoviedb.org/3/search/multi?api_key=dfc43a605d906f9da6982495ad7bb34e&language=en-US&query=${query}&page=${currentPage}&include_adult=false`
+            https://api.themoviedb.org/3/search/multi?api_key=dfc43a605d906f9da6982495ad7bb34e&language=en-US&query=${query}&page=${pageNumber}&include_adult=false`
                 );
                 setresults(prev=>[...prev,...response.data.results]);
                 settotalPages(response.data.total_pages)
-                console.log(response.data.total_pages);
             }
         } catch (error) {
             console.log("error ", error);
@@ -55,40 +104,42 @@ function Search(props) {
     function handleChange(event) {
         setquery(event.target.value);
     }
+    document.title=queryParams.get("q")+" - ZFlix"
     return (
+        <>
+        {/* <Header  /> */}
         <div className="search-container">
-            <div className="search-input-container">
-                <form action="/search" method="get">
-                    <input
-                        type="text"
-                        value={query}
-                        placeholder="Search by title, actor..."
-                        className="search-input"
-                        name="query"
-                        onChange={handleChange}
-                        id=""
-                    />
-                </form>
-            </div>
-            <div className="search-results">
-                <div className="results-container">
-                    {results.map((item) =>
-                        item.media_type === "movie" ? (
-                            <Movie item={item} key={item.id} />
-                        ) : null
-                    )}
+            {results.length?
+                <div className="first-result-container">
+                    <div className="first-result-image">
+                        <img src={"https://image.tmdb.org/t/p/original"+results[0].backdrop_path} alt="" />
+                    </div>
+                    <div className="first-result-detail">
+                        <p className="title">{results[0].media_type==="movie"?results[0].title:results[0].name} ({results[0].media_type==="movie"?getYear(results[0].release_date):getYear(results[0].first_air_date)})</p>
+                        <div className="watch-now">
+                            <span><i class="fas fa-play"></i></span>
+                            Watch Now
+                        </div>
+                    </div>
+                </div>
+            :null}
+            <div className="whole-results-container">
+                <div className="result-genre">
+                </div>
+                <div className="search-results">
+                    <p className="result-heading">Search "{queryParams.get("q")}"</p>
+                    <div className="results-container">
+                        {results.map((item) =>
+                            item.media_type === "movie" ? (
+                                <Movie item={item} key={item.id} />
+                            ) : <TvShow item={item} key={item.id}  />
+                        )}
+                    </div>
                 </div>
             </div>
-            <div className="load-more" onClick={()=>{
-                if(currentPage<totalPages)
-                {
-                    setcurrentPage(prev=>prev+1)
-                }
-                }
-                }>
-                <button>Load more</button>
-            </div>
+            
         </div>
+        </>
     );
 }
 

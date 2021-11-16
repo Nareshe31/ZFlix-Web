@@ -6,7 +6,8 @@
   padding: 0;
   box-sizing: border-box;
   font-family: "Poppins", sans-serif;
-  color: #fff;
+  color: #dbdbdb;
+  touch-action: manipulation;
 }
 a{
   text-decoration: none;
@@ -47,7 +48,8 @@ body {
 }
 
 .poster-container {
-  overflow-x: auto;
+  /* width: 100%; */
+  /* overflow-x: hidden; */
   display: flex;
 }
 
@@ -83,6 +85,8 @@ body {
 }
 .whole-poster {
   margin: 2rem 10px;
+  width: 100%;
+  overflow: hidden;
 }
 .poster-header {
   color: #fff;

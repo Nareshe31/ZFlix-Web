@@ -1,10 +1,12 @@
 import React from "react";
+import {  Link} from 'react-router-dom';
 
 export default function Poster({ item, type }) {
   const getYear = (date) => {
-    return date.slice(0, 4);
+    return date?.slice(0, 4);
   };
   return (
+    <Link to={"/en/watch/movie/"+item.id+"/"+item?.title?.replace(/\s+/g, '-').toLowerCase()+"-"+getYear(item.release_date)}>
     <div className="poster">
       <img
         alt={item.title}
@@ -22,6 +24,7 @@ export default function Poster({ item, type }) {
         </p>
       </div>
     </div>
+    </Link>
   );
 }
 

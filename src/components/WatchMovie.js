@@ -4,7 +4,7 @@ import {useParams,useLocation} from 'react-router-dom'
 function WatchMovie(props) {
     let query=new URLSearchParams(useLocation().search);
     let {id,name}=useParams()
-    document.title=name
+    document.title=name.replace(/-/g, ' ')
     const iframeStyle={
         border:"0px",
         width:"100%",
