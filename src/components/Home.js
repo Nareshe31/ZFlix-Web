@@ -2,14 +2,17 @@
 import React, { useEffect, useState } from 'react'
 import axios from 'axios';
 import Poster from './molecules/Poster';
+import ScrollContainer from 'react-indiana-drag-scroll'
 
 function Home() {
   const [movieData, setmovieData] = useState([])
   const [tvData, settvData] = useState([])
+
   useEffect(() => {
     async function getAllResults() {
       await getMovieData();
       await getTvData()
+      await getYTSData()
     }
     getAllResults()
     return () => {
@@ -17,7 +20,8 @@ function Home() {
     }
   }, [])
 
-  document.title = "ZFlix - Home"
+ 
+  document.title = "Watch Movies & TV Shows"
 
   const getMovieData = async () => {
     try {
@@ -41,24 +45,47 @@ function Home() {
     }
   };
 
+  const getYTSData = async () => {
+    try {
+      var response = await axios.get(
+        `https://yts.mx/api/v2/movie_details.json?movie_id=10`
+      );
+      console.log(response.data);
+      // setmovieData(response.data);
+    } catch (error) {
+      console.log("error");
+    }
+  };
+
   return (
-    <div className="main" style={{paddingTop:"50px"}}>
-      <div className="whole-poster">
-        <div className="poster-header">Trending Movies</div>
-        <div className="poster-container">
-          {movieData.map((item) => (
-            <Poster type="movie" key={item.id} item={item} />
-          ))}
+    <div className="main-content" >
+      <section className="section-main">
+        <div className="section-header">
+          <h2 className="heading">Trending Movies</h2>
+          <p>Here are some of the most recent movies recommended by our community</p>
         </div>
-      </div>
-      <div className="whole-poster">
-        <div className="poster-header">Trending TV Shows</div>
-        <div className="poster-container">
-          {tvData.map((item) => (
-            <Poster type="tv" key={item.id} item={item} />
-          ))}
+        <div className="whole-poster">
+          <ScrollContainer className="poster-container">
+            {movieData.map((item) => (
+              <Poster type="movie" key={item.id} item={item} />
+            ))}
+          </ScrollContainer>
         </div>
-      </div>
+      </section>
+
+      <section className="section-main">
+        <div className="section-header">
+          <h2 className="heading">Trending TV Shows</h2>
+          <p>Check out what everyone is talking about</p>
+        </div>
+        <div className="whole-poster">
+          <ScrollContainer className="poster-container">
+            {tvData.map((item) => (
+              <Poster type="tv" key={item.id} item={item} />
+            ))}
+          </ScrollContainer>
+        </div>
+      </section>
     </div>
   )
 }

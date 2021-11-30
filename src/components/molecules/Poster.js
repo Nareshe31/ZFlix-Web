@@ -1,22 +1,42 @@
 import React from "react";
-import {  Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Poster({ item, type }) {
   const getYear = (date) => {
     return date?.slice(0, 4);
   };
+  const removeSpecialCharacters=(title)=>{
+    return title.replace(/[&#,+()$~%'.":!*?<>{}]/g, '')
+  }
+
+  const covertToLinkWords=(title)=>{
+    var s=removeSpecialCharacters(title)
+    return s.replace(/\s+/g, '-').toLowerCase()
+  }
+
+  const getLink=()=>{
+    if(type==="movie"){
+      return "/en/movie/" + item.id + "/" + covertToLinkWords(type==="movie"?item.title:item.name) + "-" + getYear(item.release_date)
+    }
+    else return "/en/tv/" + item.id + "/" + covertToLinkWords(type==="movie"?item.title:item.name) + "-" + getYear(item.first_air_date)
+  }
+  
   return (
-    <Link to={"/en/watch/movie/"+item.id+"/"+item?.title?.replace(/\s+/g, '-').toLowerCase()+"-"+getYear(item.release_date)}>
     <div className="poster">
-      <img
-        alt={item.title}
-        src={"https://image.tmdb.org/t/p/w780" + item.poster_path}
-        className="poster-image"
-      />
+      <Link to={getLink()}>
+        <img
+          alt={item.title}
+          src={"https://image.tmdb.org/t/p/original" + item.poster_path}
+          className="poster-image"
+        />
+      </Link>
+
       <div className="poster-detail">
-        <p className="poster-title">
-          {type === "movie" ? item.title : item.name}
-        </p>
+        <Link to={getLink()}>
+          <p className="poster-title">
+            {type === "movie" ? item.title : item.name}
+          </p>
+        </Link>
         <p className="poster-year">
           {type === "movie"
             ? getYear(item.release_date)
@@ -24,7 +44,6 @@ export default function Poster({ item, type }) {
         </p>
       </div>
     </div>
-    </Link>
   );
 }
 

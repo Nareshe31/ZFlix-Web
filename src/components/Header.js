@@ -105,6 +105,10 @@ function Header() {
                     :
                     <li className="nav-item search"  onClick={handleSearchToggle}>
                         <i className="fas fa-search"></i>
+                        <div className="icon-info">
+                            <span>Search</span> 
+                            <span>(Ctrl + /)</span> 
+                        </div>
                     </li>
                 }
             </ul>

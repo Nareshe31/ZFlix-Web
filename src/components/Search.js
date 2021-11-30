@@ -12,9 +12,19 @@ const getDate = (date) => {
   const getYear = (date) => {
     return date?.slice(0, 4);
   };
+
+  const removeSpecialCharacters=(title)=>{
+    return title.replace(/[&#,+()$~%'.":!*?<>{}]/g, '')
+  }
+
+  const covertToLinkWords=(title)=>{
+    var s=removeSpecialCharacters(title)
+    return s.replace(/\s+/g, '-').toLowerCase()
+  }
+
 function Movie({ item }) {
     return (
-        <Link to={"/en/watch/movie/" + item.id + "/" + item.title}>
+        <Link to={"/en/movie/" + item.id + "/" + covertToLinkWords(item.title) + "-" + getYear(item.release_date)}>
             <div className="result-box" key={item.id}>
                 <div className="result-image">
                     <img
@@ -45,7 +55,7 @@ function Movie({ item }) {
 }
 function TvShow({ item }) {
     return (
-        <Link to={"/en/watch/tv/" + item.id + "/" + item.name}>
+        <Link to={"/en/tv/" + item.id + "/" + covertToLinkWords(item.name)+ "-" + getYear(item.first_air_date)}>
             <div className="result-box" key={item.id}>
                 <div className="result-image">
                     <img
