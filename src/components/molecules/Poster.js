@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
+import { LazyLoadImage } from 'react-lazy-load-image-component';
 
 export default function Poster({ item, type }) {
   const getYear = (date) => {
@@ -24,10 +25,12 @@ export default function Poster({ item, type }) {
   return (
     <div className="poster">
       <Link to={getLink()}>
-        <img
+        <LazyLoadImage
           alt={item.title}
           src={"https://image.tmdb.org/t/p/original" + item.poster_path}
           className="poster-image"
+          loading="lazy"
+          effect="blur"
         />
       </Link>
 

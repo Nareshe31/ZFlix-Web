@@ -1,38 +1,58 @@
-import axios from 'axios';
-import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Link, useParams } from "react-router-dom";
+import ScrollContainer from "react-indiana-drag-scroll";
 
 const getYear = (date) => {
   return date?.slice(0, 4);
 };
 
-
 function TvShow() {
-  const [data, setdata] = useState({})
-  const [watch, setwatch] = useState(false)
+  const [data, setdata] = useState({});
+  const [watch, setwatch] = useState(false);
+  const [season, setseason] = useState(1)
+  const [seasonData, setseasonData] = useState({})
 
-  let { id } = useParams()
+  let { id,name } = useParams();
   useEffect(() => {
     async function getAllResults() {
-      await getData()
+      await getData();
+    }
+    getAllResults();
+    return () => { };
+  }, [id]);
+
+  useEffect(() => {
+    getSeasonDetails()
+    return () => {
       
     }
-    getAllResults()
-    return () => {
-
-    }
-  }, [])
-
+  }, [season])
   const getData = async () => {
     try {
       var response = await axios.get(
         `
-          https://api.themoviedb.org/3/tv/${id}?api_key=dfc43a605d906f9da6982495ad7bb34e&language=en-US&append_to_response=videos`
+          https://api.themoviedb.org/3/tv/${id}?api_key=dfc43a605d906f9da6982495ad7bb34e&language=en-US&append_to_response=videos,credits`
       );
       setdata(response.data);
-      // console.log(response.data.videos);
+
+      document.title =
+        response.data.name +
+        " (" +
+        getYear(response.data.first_air_date) +
+        ")";
+    } catch (error) {
+      console.log("error");
+    }
+  };
+  const getSeasonDetails = async () => {
+    try {
+      var response = await axios.get(
+        `
+        https://api.themoviedb.org/3/tv/${id}/season/${season}}?api_key=dfc43a605d906f9da6982495ad7bb34e&language=en-US`
+      );
+      setseasonData(response.data);
       
-      document.title = response.data.title + " (" + getYear(response.data.first_air_date) + ")"
     } catch (error) {
       console.log("error");
     }
@@ -40,61 +60,174 @@ function TvShow() {
 
   return (
     <div className="w-content">
-      <div className={watch?"content active":"content"}>
-        {Object.keys(data).length ?
-          <div className="content-bg">
-            {/* <Image src={"https://image.tmdb.org/t/p/original" + data.backdrop_path} thumbnail={"https://pbs.twimg.com/media/FFXHDTjXEA8bBXH?format=jpg&name=900x900"} /> */}
-            <img crossOrigin="anonymous" id="bg-poster" src={"https://image.tmdb.org/t/p/original" + data.backdrop_path} alt="" srcset="" />
-          </div>
-          : null
-        }
-        <div className="content-data">
-          <div className="content-info">
-            <div className="content-poster">
-              <img src={"https://image.tmdb.org/t/p/w780" + data.poster_path} alt="" srcset="" />
+      {Object.keys(data).length ? (
+        <div className={watch ? "content active" : "content"}>
+          <div
+            className="content-bg"
+            style={{
+              backgroundImage: `url(https://image.tmdb.org/t/p/original${data.backdrop_path})`,
+            }}
+          ></div>
+
+          <div className="content-parent">
+            <div className="content-hero">
+              <div className="content-info">
+                <div className="content-poster">
+                  <img
+                    src={"https://image.tmdb.org/t/p/w780" + data.poster_path}
+                    alt=""
+                    srcset=""
+                  />
+                </div>
+                <div className="content-plot">
+                  <h2 className="content-title">{data.name}</h2>
+                  <p className="content-tagline">{data.tagline}</p>
+                  <p className="content-details">
+                    <i className="fas fa-calendar-alt"></i>{" "}
+                    {getYear(data.first_air_date)}
+                    <span className="dot">.</span>
+                    <span>
+                      <i className="fas fa-star"></i> {data.vote_average}
+                    </span>
+                    <span className="dot">.</span>
+                    <span className="runtime">
+                      <i className="fas fa-clock"></i> {data.runtime} mins
+                    </span>
+                  </p>
+                  <div className="genres">
+                    {data?.genres?.map((item, i) => (
+                      <span className="genre">{item.name}</span>
+                    ))}
+                  </div>
+                  <p className="content-overview">{data.overview}</p>
+                  <div className="show">
+                    <div className="watch-now" onClick={() => setwatch(true)}>
+                      <i class="fas fa-play"></i>
+                      Watch Now
+                    </div>
+                    <div
+                      className="show-trailer"
+                      onClick={() => setwatch(true)}
+                    >
+                      Trailer
+                    </div>
+                  </div>
+                </div>
+              </div>
+             
             </div>
-            <div className="content-plot">
-              <h2 className="content-title">{data.name}
-              </h2>
-              <p className="content-tagline">{data.tagline}</p>
-              <p className="content-details"><i className="fas fa-calendar-alt"></i> {getYear(data.first_air_date)}<span className="dot">.</span>  
-                <span><i className="fas fa-star"></i> {data.vote_average}</span><span className="dot">.</span> 
-                <span className="runtime"><i className="fas fa-clock"></i> {data.runtime} mins</span>
-              </p>
-              <div className="genres">
-              {data?.genres?.map((item,i)=><span className="genre">{item.name}</span>)}
-              </div>
-              <p className="content-overview">{data.overview}</p>
-              <div className="show">
-                <div className="watch-now" onClick={()=>setwatch(true)}>
-                  <i class="fas fa-play"></i>
-                  Watch Now
+            <div className="season-container">
+                <div className="c-header">
+                    <div className="h-line" />
+                    <h2>Seasons</h2>
+                    <div className="h-line" />
+                  </div>
+                <div className="season-dropdown">
+                  <div className="seasons">
+                      {data.seasons.map((item)=>{
+                        return item.season_number!==0?
+                        <Link to={"/en/tv/"+id+"/"+name+"/season-"+item.season_number}>
+                        <div className="season">
+                          <img src={"https://image.tmdb.org/t/p/w500"+item.poster_path} alt="" />
+                          <div className="s-content">
+                            <div className="s-no">Season {item.season_number}</div>
+                            {/* <div className="s-overview">{item.overview}</div> */}
+                            <p className="s-e-count">{item.episode_count} Episodes</p>
+                          </div>
+                        </div>
+                        </Link>
+                        :null
+                      }
+                      )}
+                  </div>
                 </div>
-                <div className="show-trailer" onClick={()=>setwatch(true)}>
-                  Trailer
-                </div>
               </div>
+            {data?.credits?.cast.length?
+              <div className="content-c">
+                  <div className="c-header">
+                    <div className="h-line" />
+                    <h2>Cast</h2>
+                    <div className="h-line" />
+                  </div>
+                  <ScrollContainer className="c-container">
+                    {data?.credits?.cast.map((item) => (
+                      <div className="c-parent">
+                        {item.profile_path ? (
+                          <img
+                            className="c-image"
+                            src={
+                              "https://image.tmdb.org/t/p/original" +
+                              item.profile_path
+                            }
+                            alt=""
+                          />
+                        ) : (
+                          <div className="no-image-container">
+                            <img
+                              className="no-image"
+                              src="/assets/image-not-found.png"
+                              alt="not found"
+                              srcset=""
+                            />
+                          </div>
+                        )}
+                        <div className="c-detail">
+                          <p className="c-name">{item.name}</p>
+                          <p className="c-job">
+                            <em>{item.character}</em>
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </ScrollContainer>
+                </div>
+            :null}
+              {data?.credits?.crew.length?
+                <div className="content-c">
+                  <div className="c-header">
+                    <div className="h-line" />
+                    <h2>Crew</h2>
+                    <div className="h-line" />
+                  </div>
+                  <ScrollContainer className="c-container">
+                    {data?.credits?.crew.map((item) => (
+                      <div className="c-parent">
+                        {item.profile_path ? (
+                          <img
+                            className="c-image"
+                            src={
+                              "https://image.tmdb.org/t/p/original" +
+                              item.profile_path
+                            }
+                            alt=""
+                          />
+                        ) : (
+                          <div className="no-image-container">
+                            <img
+                              className="no-image"
+                              src="/assets/image-not-found.png"
+                              alt="not found"
+                              srcset=""
+                            />
+                          </div>
+                        )}
+                        <div className="c-detail">
+                          <p className="c-name">{item.name}</p>
+                          <p className="c-job">
+                            <em>{item.job}</em>
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </ScrollContainer>
+                </div>
+              :null}
               
-            </div>
           </div>
-          <div className="content-cast">
-
-          </div>
-          <div className="content-rating">
-
-          </div>
-
         </div>
-      </div>
-      {/* {Object.keys(data).length && watch ?
-        <div className={watch?"watch-container active":"watch-container"}>
-          <div className="close-btn" onClick={()=>setwatch(false)}><i class="fas fa-times"></i></div>
-          <iframe src={"https://www.2embed.ru/embed/tmdb/movie?id="+data.id} allowFullScreen={true} title={data.title} frameborder="0">Loading</iframe>
-        </div>
-        : null
-      } */}
+      ) : null}
     </div>
-  )
+  );
 }
 
 export default TvShow;
